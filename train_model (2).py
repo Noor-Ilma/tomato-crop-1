@@ -1,32 +1,35 @@
-# train_model.py
-
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score
+from sklearn.ensemble import RandomForestRegressor  # Use RandomForestRegressor for regression tasks
+from sklearn.metrics import mean_squared_error, r2_score
 import joblib
 
 # Load dataset
-data = pd.read_csv('credit_risk_dataset.csv')
+data = pd.read_csv('your_tomato_crop_dataset.csv')  # Replace with your dataset's filename
 
-# Data preprocessing (modify this based on your dataset)
-# Assuming columns 'income', 'loan_amount', 'credit_score', 'employment_length', and 'loan_default'
-data['debt_income_ratio'] = data['loan_amnt'] / data['person_income']
+# Data preprocessing
+# Calculate additional features if necessary (e.g., moisture levels, temperature variations)
+# For example: 
+data['debt_income_ratio'] = data['Wind_Speed'] / data['Humidity']  # Adjust this feature as needed
 
 # Prepare feature and target variables
-X = data[['person_income', 'debt_income_ratio', 'person_emp_length']]
-y = data['cb_person_default_on_file']
+# Select relevant features based on your dataset
+X = data[['Soil_pH', 'Temperature', 'Humidity', 'N', 'K', 'Wind_Speed']]
+y = data['Crop_Yield']  # Assuming Crop_Yield is the target variable for prediction
 
 # Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Train a RandomForest model
-model = RandomForestClassifier(n_estimators=100, random_state=42)
+# Train a Random Forest model for regression
+model = RandomForestRegressor(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
 
 # Evaluate the model
 y_pred = model.predict(X_test)
-print(f"Accuracy: {accuracy_score(y_test, y_pred)}")
+
+# Print evaluation metrics
+print(f"Mean Squared Error: {mean_squared_error(y_test, y_pred)}")
+print(f"R² Score: {r2_score(y_test, y_pred)}")
 
 # Save the model
-joblib.dump(model, 'credit_risk_model.pkl')
+joblib.dump(model, 'tomato_crop_yield_model.pkl')
